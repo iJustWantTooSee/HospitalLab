@@ -45,6 +45,12 @@ namespace Backend5
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            using (var context = scope.ServiceProvider.GetService<ApplicationDbContext>())
+            {
+                context.Database.Migrate();
+            }
+
             app.UseStaticFiles();
 
             app.UseMvc(routes =>
@@ -53,6 +59,7 @@ namespace Backend5
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
     }
 }
