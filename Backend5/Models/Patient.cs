@@ -4,10 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Backend5.Models.ViewModels
+namespace Backend5.Models
 {
-    public class PatientModel
+    public class Patient
     {
+        public Int32 PatientId { get; set; }
+
         [Required]
         [MaxLength(200)]
         public String Name { get; set; }
@@ -17,5 +19,13 @@ namespace Backend5.Models.ViewModels
         public DateTime Birthday { get; set; }
 
         public String Gender { get; set; }
+
+        public ICollection<Analysis> Analyses { get; set; }
+
+        public ICollection<DoctorPatient> Doctors { get; set; }
+
+        public ICollection<Placement> Placements { get; set; }
+
+        public ICollection<Diagnosis> Diagnoses { get; set; }
     }
 }

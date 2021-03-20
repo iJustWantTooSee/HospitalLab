@@ -4,14 +4,16 @@ using Backend5.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Backend5.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210320170951_AddDoctorPatients")]
+    partial class AddDoctorPatients
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,36 +52,6 @@ namespace Backend5.Migrations
                     b.HasIndex("PatientId");
 
                     b.ToTable("Analyses");
-                });
-
-            modelBuilder.Entity("Backend5.Models.Diagnosis", b =>
-                {
-                    b.Property<int>("DiagnosisId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Complications")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
-
-                    b.Property<string>("Details")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PatientId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
-
-                    b.HasKey("DiagnosisId");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("Diagnoses");
                 });
 
             modelBuilder.Entity("Backend5.Models.Doctor", b =>
@@ -249,31 +221,6 @@ namespace Backend5.Migrations
                     b.ToTable("Patients");
                 });
 
-            modelBuilder.Entity("Backend5.Models.Placement", b =>
-                {
-                    b.Property<int>("PlacementId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Bed")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PatientId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WardId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PlacementId");
-
-                    b.HasIndex("PatientId");
-
-                    b.HasIndex("WardId");
-
-                    b.ToTable("Placements");
-                });
-
             modelBuilder.Entity("Backend5.Models.Ward", b =>
                 {
                     b.Property<int>("Id")
@@ -331,15 +278,6 @@ namespace Backend5.Migrations
 
                     b.HasOne("Backend5.Models.Patient", "Patient")
                         .WithMany("Analyses")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend5.Models.Diagnosis", b =>
-                {
-                    b.HasOne("Backend5.Models.Patient", "Patient")
-                        .WithMany("Diagnoses")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -404,21 +342,6 @@ namespace Backend5.Migrations
                     b.HasOne("Backend5.Models.Lab", "Lab")
                         .WithMany("Phones")
                         .HasForeignKey("LabId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Backend5.Models.Placement", b =>
-                {
-                    b.HasOne("Backend5.Models.Patient", "Patient")
-                        .WithMany("Placements")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Backend5.Models.Ward", "Ward")
-                        .WithMany("Placements")
-                        .HasForeignKey("WardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

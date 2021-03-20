@@ -17,5 +17,7 @@ namespace Backend5.Models
         public String Specialty { get; set; }
 
         public ICollection<HospitalDoctor> Hospitals { get; set; }
+
+        public ICollection<DoctorPatient> Patients { get; set; }
     }
 }

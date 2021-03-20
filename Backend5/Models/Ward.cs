@@ -19,5 +19,7 @@ namespace Backend5.Models
         public String Name { get; set; }
 
         public ICollection<WardStaff> WardStaffs { get; set; }
+
+        public ICollection<Placement> Placements { get; set; }
     }
 }

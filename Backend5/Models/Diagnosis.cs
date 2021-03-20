@@ -6,25 +6,23 @@ using System.Threading.Tasks;
 
 namespace Backend5.Models
 {
-    public class Analysis
+    public class Diagnosis
     {
-        public Int32 AnalysisId { get; set; }
+        public Int32 DiagnosisId { get; set; }
 
         [Required]
         [MaxLength(200)]
         public String Type { get; set; }
 
         [Required]
-        public DateTime Date { get; set; }
+        [MaxLength(200)]
+        public String Complications { get; set; }
 
-        public String Status { get; set; }
-
-        public Int32 LabId { get; set; }
-
-        public Lab Lab { get; set; }
+        public String Details { get; set; }
 
         public Int32 PatientId { get; set; }
 
         public Patient Patient { get; set; }
+
     }
 }
