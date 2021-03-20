@@ -19,5 +19,7 @@ namespace Backend5.Models
         public ICollection<LabPhone> Phones { get; set; }
 
         public ICollection<HospitalLab> Hospitals { get; set; }
+
+        public ICollection<Analysis> Analyses { get; set; }
     }
 }

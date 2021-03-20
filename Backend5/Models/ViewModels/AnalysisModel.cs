@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Backend5.Models.ViewModels
 {
-    public class Analysis
+    public class AnalysisModel
     {
         [Required]
         [MaxLength(200)]

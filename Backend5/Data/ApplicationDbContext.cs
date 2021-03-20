@@ -30,6 +30,10 @@ namespace Backend5.Data
 
         public DbSet<HospitalDoctor> HospitalDoctors { get; set; }
 
+        public DbSet<WardStaff> WardStaffs { get; set; }
+
+        public DbSet<Analysis> Analyses { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

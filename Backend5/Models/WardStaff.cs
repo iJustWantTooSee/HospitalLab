@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 
 namespace Backend5.Models
 {
-    public class Ward
+    public class WardStaff
     {
-        public Int32 Id { get; set; }
-
-        public Int32 HospitalId { get; set; }
-
-        public Hospital Hospital { get; set; }
+        public Int32 WardStaffId { get; set; }
 
         [Required]
         [MaxLength(200)]
         public String Name { get; set; }
 
-        public ICollection<WardStaff> WardStaffs { get; set; }
+        public String Position { get; set; }
+
+        public Int32 WardId { get; set; }
+
+        public Ward Ward { get; set; }
+
     }
 }
