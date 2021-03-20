@@ -26,6 +26,10 @@ namespace Backend5.Data
 
         public DbSet<HospitalLab> HospitalLabs { get; set; }
 
+        public DbSet<Doctor> Doctors { get; set; }
+
+        public DbSet<HospitalDoctor> HospitalDoctors { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -38,6 +42,9 @@ namespace Backend5.Data
 
             modelBuilder.Entity<HospitalLab>()
                 .HasKey(x => new { x.HospitalId, x.LabId });
+
+            modelBuilder.Entity<HospitalDoctor>()
+               .HasKey(x => new { x.HospitalId, x.DoctorId });
         }
     }
 }

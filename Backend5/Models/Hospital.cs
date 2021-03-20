@@ -21,5 +21,7 @@ namespace Backend5.Models
         public ICollection<Ward> Wards { get; set; }
 
         public ICollection<HospitalLab> Labs { get; set; }
+
+        public ICollection<HospitalDoctor> Doctors { get; set; }
     }
 }
