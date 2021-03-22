@@ -15,8 +15,8 @@ namespace Backend5.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ProductVersion", "3.1.13")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Backend5.Models.Analysis", b =>
@@ -40,8 +40,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("AnalysisId");
 
@@ -61,8 +61,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Complications")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
@@ -72,8 +72,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("DiagnosisId");
 
@@ -91,8 +91,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Specialty")
                         .HasColumnType("nvarchar(max)");
@@ -129,8 +129,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -177,8 +177,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Number")
                         .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasMaxLength(20);
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("HospitalId", "PhoneId");
 
@@ -197,8 +197,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -215,8 +215,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Number")
                         .IsRequired()
-                        .HasColumnType("nvarchar(20)")
-                        .HasMaxLength(20);
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("LabId", "PhoneId");
 
@@ -241,8 +241,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("PatientId");
 
@@ -286,8 +286,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -305,8 +305,8 @@ namespace Backend5.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Position")
                         .HasColumnType("nvarchar(max)");
@@ -334,6 +334,10 @@ namespace Backend5.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Lab");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("Backend5.Models.Diagnosis", b =>
@@ -343,6 +347,8 @@ namespace Backend5.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("Backend5.Models.DoctorPatient", b =>
@@ -358,6 +364,10 @@ namespace Backend5.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("Backend5.Models.HospitalDoctor", b =>
@@ -373,6 +383,10 @@ namespace Backend5.Migrations
                         .HasForeignKey("HospitalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Hospital");
                 });
 
             modelBuilder.Entity("Backend5.Models.HospitalLab", b =>
@@ -388,6 +402,10 @@ namespace Backend5.Migrations
                         .HasForeignKey("LabId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Hospital");
+
+                    b.Navigation("Lab");
                 });
 
             modelBuilder.Entity("Backend5.Models.HospitalPhone", b =>
@@ -397,6 +415,8 @@ namespace Backend5.Migrations
                         .HasForeignKey("HospitalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Hospital");
                 });
 
             modelBuilder.Entity("Backend5.Models.LabPhone", b =>
@@ -406,6 +426,8 @@ namespace Backend5.Migrations
                         .HasForeignKey("LabId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Lab");
                 });
 
             modelBuilder.Entity("Backend5.Models.Placement", b =>
@@ -421,6 +443,10 @@ namespace Backend5.Migrations
                         .HasForeignKey("WardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("Ward");
                 });
 
             modelBuilder.Entity("Backend5.Models.Ward", b =>
@@ -430,6 +456,8 @@ namespace Backend5.Migrations
                         .HasForeignKey("HospitalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Hospital");
                 });
 
             modelBuilder.Entity("Backend5.Models.WardStaff", b =>
@@ -439,6 +467,53 @@ namespace Backend5.Migrations
                         .HasForeignKey("WardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Ward");
+                });
+
+            modelBuilder.Entity("Backend5.Models.Doctor", b =>
+                {
+                    b.Navigation("Hospitals");
+
+                    b.Navigation("Patients");
+                });
+
+            modelBuilder.Entity("Backend5.Models.Hospital", b =>
+                {
+                    b.Navigation("Doctors");
+
+                    b.Navigation("Labs");
+
+                    b.Navigation("Phones");
+
+                    b.Navigation("Wards");
+                });
+
+            modelBuilder.Entity("Backend5.Models.Lab", b =>
+                {
+                    b.Navigation("Analyses");
+
+                    b.Navigation("Hospitals");
+
+                    b.Navigation("Phones");
+                });
+
+            modelBuilder.Entity("Backend5.Models.Patient", b =>
+                {
+                    b.Navigation("Analyses");
+
+                    b.Navigation("Diagnoses");
+
+                    b.Navigation("Doctors");
+
+                    b.Navigation("Placements");
+                });
+
+            modelBuilder.Entity("Backend5.Models.Ward", b =>
+                {
+                    b.Navigation("Placements");
+
+                    b.Navigation("WardStaffs");
                 });
 #pragma warning restore 612, 618
         }

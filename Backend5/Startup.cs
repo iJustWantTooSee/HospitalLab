@@ -29,6 +29,9 @@ namespace Backend5
                 options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc();
+
+            // Для перехода на версию 5.0
+            services.AddMvc(options => options.EnableEndpointRouting = false);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,7 +51,7 @@ namespace Backend5
             using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             using (var context = scope.ServiceProvider.GetService<ApplicationDbContext>())
             {
-                context.Database.Migrate();
+             //   context.Database.Migrate();
             }
 
             app.UseStaticFiles();
