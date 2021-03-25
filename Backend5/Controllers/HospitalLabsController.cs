@@ -53,7 +53,7 @@ namespace Backend5.Controllers
                 return this.NotFound();
             }
 
-            var hospital = await this.context.Hospitals
+            var hospital = await this.context.Hospitals.Include(x=> x.Labs)
                 .SingleOrDefaultAsync(x => x.Id == hospitalId);
 
             if (hospital == null)
@@ -62,7 +62,9 @@ namespace Backend5.Controllers
             }
 
             this.ViewBag.Hospital = hospital;
-            this.ViewData["LabId"] = new SelectList(this.context.Labs, "Id", "Name");
+            this.ViewData["LabId"] = new SelectList(this.context.Labs
+                .Where(l=> !this.context.HospitalLabs
+                .Any(x=>x.HospitalId == hospital.Id && x.LabId == l.Id)), "Id", "Name");
             return this.View(new HospitalLabCreateModel());
         }
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Backend5.Data;
 using Backend5.Models;
+using Backend5.Models.ViewModels;
 
 namespace Backend5.Controllers
 {
@@ -20,38 +21,53 @@ namespace Backend5.Controllers
         }
 
         // GET: HospitalDoctors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Int32? hospitalId)
         {
-            var applicationDbContext = _context.HospitalDoctors.Include(h => h.Doctor).Include(h => h.Hospital);
-            return View(await applicationDbContext.ToListAsync());
-        }
-
-        // GET: HospitalDoctors/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            if (hospitalId == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            var hospitalDoctor = await _context.HospitalDoctors
-                .Include(h => h.Doctor)
+            var hospital = await this._context.Hospitals
+               .SingleOrDefaultAsync(x => x.Id == hospitalId);
+
+            if (hospital == null)
+            {
+                return this.NotFound();
+            }
+
+            var items = await this._context.HospitalDoctors
                 .Include(h => h.Hospital)
-                .FirstOrDefaultAsync(m => m.HospitalId == id);
-            if (hospitalDoctor == null)
-            {
-                return NotFound();
-            }
-
-            return View(hospitalDoctor);
+                .Include(h => h.Doctor)
+                .Where(x => x.HospitalId == hospital.Id)
+                .ToListAsync();
+            this.ViewBag.Hospital = hospital;
+            return View(items);
         }
+
 
         // GET: HospitalDoctors/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create(Int32? hospitalId)
         {
-            ViewData["DoctorId"] = new SelectList(_context.Doctors, "DoctorId", "Name");
-            ViewData["HospitalId"] = new SelectList(_context.Hospitals, "Id", "Name");
-            return View();
+            if (hospitalId == null)
+            {
+                return this.NotFound();
+            }
+
+            var hospital = await this._context.Hospitals
+               .SingleOrDefaultAsync(x => x.Id == hospitalId);
+
+            if (hospital == null)
+            {
+                return this.NotFound();
+            }
+
+            this.ViewBag.Hospital = hospital;
+
+            this.ViewBag.DoctorsId = new SelectList(this._context.Doctors
+                .Where(l => !this._context.HospitalDoctors
+                .Any(x => x.HospitalId == hospital.Id && x.DoctorId == l.DoctorId)), "DoctorId", "Name");
+            return View(new HospitalDoctorModel());
         }
 
         // POST: HospitalDoctors/Create
@@ -59,78 +75,45 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("HospitalId,DoctorId")] HospitalDoctor hospitalDoctor)
+        public async Task<IActionResult> Create(Int32? hospitalId, HospitalDoctorModel model)
         {
+            if (hospitalId == null)
+            {
+                return this.NotFound();
+            }
+
+            var hospital = await this._context.Hospitals
+               .SingleOrDefaultAsync(x => x.Id == hospitalId);
+
+            if (hospital == null)
+            {
+                return this.NotFound();
+            }
+
             if (ModelState.IsValid)
             {
+                var hospitalDoctor = new HospitalDoctor
+                {
+                    DoctorId = model.DoctorId,
+                    HospitalId = hospital.Id
+                };
                 _context.Add(hospitalDoctor);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", new { hospitalId = hospital.Id });
             }
-            ViewData["DoctorId"] = new SelectList(_context.Doctors, "DoctorId", "Name", hospitalDoctor.DoctorId);
-            ViewData["HospitalId"] = new SelectList(_context.Hospitals, "Id", "Name", hospitalDoctor.HospitalId);
-            return View(hospitalDoctor);
+            this.ViewBag.Hospital = hospital;
+
+            this.ViewBag.DoctorsId = new SelectList(this._context.Doctors
+                .Where(l => !this._context.HospitalDoctors
+                .Any(x => x.HospitalId == hospital.Id && x.DoctorId == l.DoctorId)), "Id", "Name");
+            return View(model);
         }
 
-        // GET: HospitalDoctors/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var hospitalDoctor = await _context.HospitalDoctors.FindAsync(id);
-            if (hospitalDoctor == null)
-            {
-                return NotFound();
-            }
-            ViewData["DoctorId"] = new SelectList(_context.Doctors, "DoctorId", "Name", hospitalDoctor.DoctorId);
-            ViewData["HospitalId"] = new SelectList(_context.Hospitals, "Id", "Name", hospitalDoctor.HospitalId);
-            return View(hospitalDoctor);
-        }
-
-        // POST: HospitalDoctors/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("HospitalId,DoctorId")] HospitalDoctor hospitalDoctor)
-        {
-            if (id != hospitalDoctor.HospitalId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(hospitalDoctor);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!HospitalDoctorExists(hospitalDoctor.HospitalId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["DoctorId"] = new SelectList(_context.Doctors, "DoctorId", "Name", hospitalDoctor.DoctorId);
-            ViewData["HospitalId"] = new SelectList(_context.Hospitals, "Id", "Name", hospitalDoctor.HospitalId);
-            return View(hospitalDoctor);
-        }
 
         // GET: HospitalDoctors/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(Int32? hospitalId, Int32? doctorId)
         {
-            if (id == null)
+            if (hospitalId == null || doctorId == null)
             {
                 return NotFound();
             }
@@ -138,7 +121,7 @@ namespace Backend5.Controllers
             var hospitalDoctor = await _context.HospitalDoctors
                 .Include(h => h.Doctor)
                 .Include(h => h.Hospital)
-                .FirstOrDefaultAsync(m => m.HospitalId == id);
+                .FirstOrDefaultAsync(m => m.HospitalId == hospitalId && m.DoctorId == doctorId);
             if (hospitalDoctor == null)
             {
                 return NotFound();
@@ -150,17 +133,12 @@ namespace Backend5.Controllers
         // POST: HospitalDoctors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(Int32 hospitalId, Int32 doctorId)
         {
-            var hospitalDoctor = await _context.HospitalDoctors.FindAsync(id);
+            var hospitalDoctor = await _context.HospitalDoctors.SingleOrDefaultAsync(x => x.HospitalId == hospitalId && x.DoctorId == doctorId);
             _context.HospitalDoctors.Remove(hospitalDoctor);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool HospitalDoctorExists(int id)
-        {
-            return _context.HospitalDoctors.Any(e => e.HospitalId == id);
+            return RedirectToAction("Index", new { hospitalId = hospitalId });
         }
     }
 }

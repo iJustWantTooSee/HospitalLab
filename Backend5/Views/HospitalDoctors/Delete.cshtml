@@ -11,12 +11,12 @@
     <h4>HospitalDoctor</h4>
     <hr />
     <dl class="dl-horizontal">
-        <dt>
+        @*<dt>
             @Html.DisplayNameFor(model => model.Hospital)
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Hospital.Name)
-        </dd>
+        </dd>*@
         <dt>
             @Html.DisplayNameFor(model => model.Doctor)
         </dt>
@@ -25,10 +25,8 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="HospitalId" />
-        <input type="hidden" asp-for="DoctorId" />
+    <form asp-action="Delete" asp-route-hospitalId="@Model.HospitalId" asp-route-doctorId="@Model.DoctorId">
         <input type="submit" value="Delete" class="btn btn-default" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="Index" asp-route-hospitalId="@Model.HospitalId">Back to List</a>
     </form>
 </div>
