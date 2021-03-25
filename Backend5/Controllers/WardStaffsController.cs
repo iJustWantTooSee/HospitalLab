@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Backend5.Data;
 using Backend5.Models;
+using Backend5.Models.ViewModels;
 
 namespace Backend5.Controllers
 {
@@ -20,14 +21,32 @@ namespace Backend5.Controllers
         }
 
         // GET: WardStaffs
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Int32? wardId)
         {
-            var applicationDbContext = _context.WardStaffs.Include(w => w.Ward);
-            return View(await applicationDbContext.ToListAsync());
+            if (wardId == null)
+            {
+                return this.NotFound();
+            }
+
+            var ward = await this._context.Wards
+                .SingleOrDefaultAsync(x => x.Id == wardId);
+
+            if (ward == null)
+            {
+                return this.NotFound();
+            }
+
+            this.ViewBag.Ward = ward;
+            var wardStaffs = await this._context.WardStaffs
+                .Include(w => w.Ward)
+                .Where(x => x.Ward.Id == wardId)
+                .ToListAsync();
+
+            return View(wardStaffs);
         }
 
         // GET: WardStaffs/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(Int32? id)
         {
             if (id == null)
             {
@@ -46,10 +65,18 @@ namespace Backend5.Controllers
         }
 
         // GET: WardStaffs/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create(Int32? wardId)
         {
-            ViewData["WardId"] = new SelectList(_context.Wards, "Id", "Name");
-            return View();
+            if (wardId == null)
+            {
+                return this.NotFound();
+            }
+
+            var ward = await this._context.Wards
+                .SingleOrDefaultAsync(x => x.Id == wardId);
+
+            this.ViewBag.Ward = ward;
+            return View(new WardStaffModel());
         }
 
         // POST: WardStaffs/Create
@@ -57,33 +84,60 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("WardStaffId,Name,Position,WardId")] WardStaff wardStaff)
+        public async Task<IActionResult> Create(Int32? wardId, WardStaffModel model)
         {
+            if (wardId == null)
+            {
+                return this.NotFound();
+            }
+
+            var ward = await this._context.Wards
+                .SingleOrDefaultAsync(x => x.Id == wardId);
+
+            if (ward == null)
+            {
+                return this.NotFound();
+            }
+
             if (ModelState.IsValid)
             {
+                var wardStaff = new WardStaff
+                {
+                    WardId = ward.Id,
+                    Ward = ward,
+                    Name = model.Name,
+                    Position = model.Position
+                    
+                };
                 _context.Add(wardStaff);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", new {wardId = ward.Id});
             }
-            ViewData["WardId"] = new SelectList(_context.Wards, "Id", "Name", wardStaff.WardId);
-            return View(wardStaff);
+            this.ViewBag.Ward = ward;
+            return View(model);
         }
 
         // GET: WardStaffs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(Int32? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var wardStaff = await _context.WardStaffs.FindAsync(id);
+            var wardStaff = await _context.WardStaffs.Include(x=>x.Ward).SingleOrDefaultAsync(x=>x.WardStaffId == id);
             if (wardStaff == null)
             {
                 return NotFound();
             }
-            ViewData["WardId"] = new SelectList(_context.Wards, "Id", "Name", wardStaff.WardId);
-            return View(wardStaff);
+            var model = new WardStaffModel
+            {
+                Name = wardStaff.Name,
+                Position = wardStaff.Position
+            };
+
+            this.ViewBag.Ward = wardStaff.Ward;
+            return View(model);
         }
 
         // POST: WardStaffs/Edit/5
@@ -91,35 +145,30 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("WardStaffId,Name,Position,WardId")] WardStaff wardStaff)
+        public async Task<IActionResult> Edit(Int32? id, WardStaffModel model)
         {
-            if (id != wardStaff.WardStaffId)
+            if (id == null)
             {
-                return NotFound();
+                return this.NotFound();
+            }
+
+            var wardStaff = await this._context.WardStaffs
+                .SingleOrDefaultAsync(x => x.WardStaffId == id);
+
+            if (wardStaff == null)
+            {
+                return this.NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(wardStaff);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!WardStaffExists(wardStaff.WardStaffId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                wardStaff.Name = model.Name;
+                wardStaff.Position = model.Position;
+                await this._context.SaveChangesAsync();
+                return this.RedirectToAction("Index", new { wardId = wardStaff.WardId });
             }
-            ViewData["WardId"] = new SelectList(_context.Wards, "Id", "Name", wardStaff.WardId);
-            return View(wardStaff);
+            this.ViewBag.Ward = wardStaff.Ward;
+            return View(model);
         }
 
         // GET: WardStaffs/Delete/5
@@ -146,15 +195,10 @@ namespace Backend5.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var wardStaff = await _context.WardStaffs.FindAsync(id);
-            _context.WardStaffs.Remove(wardStaff);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool WardStaffExists(int id)
-        {
-            return _context.WardStaffs.Any(e => e.WardStaffId == id);
+            var wardStaff = await _context.WardStaffs.SingleOrDefaultAsync(x=>x.WardStaffId==id);
+            this._context.WardStaffs.Remove(wardStaff);
+            await this._context.SaveChangesAsync();
+            return this.RedirectToAction("Index", new { wardId = wardStaff.WardId });
         }
     }
 }

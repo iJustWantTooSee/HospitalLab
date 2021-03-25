@@ -65,7 +65,9 @@ namespace Backend5.Controllers
                 {
                     Name = model.Name,
                     Address = model.Address,
-                    Phones = new Collection<HospitalPhone>()
+                    Phones = new Collection<HospitalPhone>(),
+                    //Doctors = new Collection<HospitalDoctor>(),
+                    //Labs = new Collection<HospitalLab>()
                 };
                 if (model.Phones != null)
                 {

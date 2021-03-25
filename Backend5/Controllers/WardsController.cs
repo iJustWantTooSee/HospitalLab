@@ -42,7 +42,7 @@ namespace Backend5.Controllers
                 .Where(x => x.HospitalId == hospitalId)
                 .ToListAsync();
 
-            return this.View(wards);
+            return View(wards);
         }
 
         // GET: Wards/Details/5
@@ -108,6 +108,7 @@ namespace Backend5.Controllers
             {
                 var ward = new Ward
                 {
+                    Hospital = hospital,
                     HospitalId = hospital.Id,
                     Name = model.Name
                 };
@@ -139,7 +140,7 @@ namespace Backend5.Controllers
             {
                 Name = ward.Name
             };
-
+            this.ViewBag.HospitalId = ward.HospitalId;
             return this.View(model);
         }
 
@@ -186,7 +187,7 @@ namespace Backend5.Controllers
             {
                 return this.NotFound();
             }
-
+            this.ViewBag.HospitalId = ward.HospitalId;
             return this.View(ward);
         }
 

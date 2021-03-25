@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Backend5.Data;
 using Backend5.Models;
+using Backend5.Models.ViewModels;
 
 namespace Backend5.Controllers
 {
@@ -46,7 +47,7 @@ namespace Backend5.Controllers
         // GET: Doctors/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new DoctorCreateModel());
         }
 
         // POST: Doctors/Create
@@ -54,15 +55,20 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DoctorId,Name,Specialty")] Doctor doctor)
+        public async Task<IActionResult> Create(DoctorCreateModel model)
         {
             if (ModelState.IsValid)
             {
+                var doctor = new Doctor
+                {
+                    Name = model.Name,
+                    Specialty = model.Specialty
+                };
                 _context.Add(doctor);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
-            return View(doctor);
+            return View(model);
         }
 
         // GET: Doctors/Edit/5
@@ -73,12 +79,19 @@ namespace Backend5.Controllers
                 return NotFound();
             }
 
-            var doctor = await _context.Doctors.FindAsync(id);
+            var doctor = await _context.Doctors.SingleOrDefaultAsync(x => x.DoctorId == id);
+            
             if (doctor == null)
             {
                 return NotFound();
             }
-            return View(doctor);
+
+            var model = new DoctorEditModel
+            {
+                Name = doctor.Name,
+                Specialty = doctor.Specialty
+            };
+            return View(model);
         }
 
         // POST: Doctors/Edit/5
@@ -86,34 +99,28 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DoctorId,Name,Specialty")] Doctor doctor)
+        public async Task<IActionResult> Edit(int? id, DoctorEditModel model)
         {
-            if (id != doctor.DoctorId)
+            if (id == null)
             {
                 return NotFound();
             }
 
+            var doctor = await this._context.Doctors.FirstOrDefaultAsync(x => x.DoctorId == id);
+
+            if (doctor == null)
+            {
+                return this.NotFound();
+            }
+
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(doctor);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DoctorExists(doctor.DoctorId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                doctor.Name = model.Name;
+                doctor.Specialty = model.Specialty;
+                await this._context.SaveChangesAsync();
+                return this.RedirectToAction("Index");
             }
-            return View(doctor);
+            return View(model);
         }
 
         // GET: Doctors/Delete/5
@@ -143,11 +150,6 @@ namespace Backend5.Controllers
             _context.Doctors.Remove(doctor);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool DoctorExists(int id)
-        {
-            return _context.Doctors.Any(e => e.DoctorId == id);
         }
     }
 }
