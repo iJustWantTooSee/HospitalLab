@@ -4,14 +4,16 @@ using Backend5.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Backend5.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210326110949_AddNullValutToLabIdFromAnalysis")]
+    partial class AddNullValutToLabIdFromAnalysis
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -325,8 +327,7 @@ namespace Backend5.Migrations
                 {
                     b.HasOne("Backend5.Models.Lab", "Lab")
                         .WithMany("Analyses")
-                        .HasForeignKey("LabId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("LabId");
 
                     b.HasOne("Backend5.Models.Patient", "Patient")
                         .WithMany("Analyses")

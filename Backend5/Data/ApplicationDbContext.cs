@@ -60,6 +60,11 @@ namespace Backend5.Data
 
             modelBuilder.Entity<DoctorPatient>()
               .HasKey(x => new { x.DoctorId, x.PatientId });
+
+            modelBuilder.Entity<Analysis>()
+                .HasOne(p => p.Lab)
+                .WithMany(t => t.Analyses)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

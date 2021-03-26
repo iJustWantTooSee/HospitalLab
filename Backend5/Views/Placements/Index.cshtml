@@ -7,7 +7,7 @@
 <h2>Index</h2>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" asp-route-wardId="@ViewBag.Ward.Id">Create New</a>
 </p>
 <table class="table">
     <thead>
@@ -16,16 +16,14 @@
                 @Html.DisplayNameFor(model => model.Bed)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Ward)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Patient)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model)
+        {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Bed)
@@ -34,14 +32,17 @@
                 @Html.DisplayFor(modelItem => item.Ward.Name)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.Ward.Name)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Patient.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.PlacementId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PlacementId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PlacementId">Delete</a>
+                <a asp-action="Edit" asp-route-placementId="@item.PlacementId">Edit</a> |
+                <a asp-action="Details" asp-route-placementId="@item.PlacementId">Details</a> |
+                <a asp-action="Delete" asp-route-placementId="@item.PlacementId">Delete</a>
             </td>
         </tr>
-}
+        }
     </tbody>
 </table>

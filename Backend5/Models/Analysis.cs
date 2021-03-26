@@ -19,7 +19,7 @@ namespace Backend5.Models
 
         public String Status { get; set; }
 
-        public Int32 LabId { get; set; }
+        public Int32? LabId { get; set; }
 
         public Lab Lab { get; set; }
 

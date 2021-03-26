@@ -25,6 +25,7 @@
     </dl>
 </div>
 <div>
+    <a asp-controller="Placements" asp-action="Index" asp-route-wardId="@Model.Id">Placement</a> |
     <a asp-controller="WardStaffs" asp-action="Index" asp-route-wardId="@Model.Id">WardStaffs</a> |
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index" asp-route-hospitalId="@Model.HospitalId">Back to List</a>

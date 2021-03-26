@@ -10,5 +10,7 @@ namespace Backend5.Models.ViewModels
     {
         [Required]
         public Int32 Bed { get; set; }
+
+        public Int32 PatientId { get; set; }
     }
 }
