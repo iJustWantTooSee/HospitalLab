@@ -1,4 +1,4 @@
-﻿@model Backend5.Models.Analysis
+﻿@model Backend5.Models.ViewModels.AnalysisModel
 
 @{
     ViewData["Title"] = "Create";
@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" asp-route-patientId="@ViewBag.Patient.PatientId">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Type" class="control-label"></label>
@@ -32,10 +32,6 @@
                 <select asp-for="LabId" class ="form-control" asp-items="ViewBag.LabId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="PatientId" class="control-label"></label>
-                <select asp-for="PatientId" class ="form-control" asp-items="ViewBag.PatientId"></select>
-            </div>
-            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>
         </form>
@@ -43,7 +39,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-patientId="@ViewBag.Patient.PatientId">Back to List</a>
 </div>
 
 @section Scripts {

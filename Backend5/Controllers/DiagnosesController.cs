@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Backend5.Data;
 using Backend5.Models;
+using Backend5.Models.ViewModels;
 
 namespace Backend5.Controllers
 {
@@ -20,36 +21,69 @@ namespace Backend5.Controllers
         }
 
         // GET: Diagnoses
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Int32? patientId)
         {
-            var applicationDbContext = _context.Diagnoses.Include(d => d.Patient);
-            return View(await applicationDbContext.ToListAsync());
+            if (patientId == null)
+            {
+                return this.NotFound();
+            }
+
+            var patient = await this._context.Patients
+                .SingleOrDefaultAsync(x => x.PatientId == patientId);
+
+            if (patient == null)
+            {
+                return this.NotFound();
+            }
+
+            ViewBag.Patient = patient;
+
+            var diagnoses = await this._context.Diagnoses
+                .Include(x => x.Patient)
+                .Where(h => h.PatientId == patientId)
+                .ToListAsync();
+
+            return View(diagnoses);
         }
 
         // GET: Diagnoses/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(Int32? diagnosisId)
         {
-            if (id == null)
+            if (diagnosisId == null)
             {
                 return NotFound();
             }
 
             var diagnosis = await _context.Diagnoses
                 .Include(d => d.Patient)
-                .FirstOrDefaultAsync(m => m.DiagnosisId == id);
+                .FirstOrDefaultAsync(m => m.DiagnosisId == diagnosisId);
             if (diagnosis == null)
             {
                 return NotFound();
             }
 
+            ViewBag.PatientId = diagnosis.PatientId;
             return View(diagnosis);
         }
 
         // GET: Diagnoses/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create(Int32? patientId)
         {
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Name");
-            return View();
+            if (patientId == null)
+            {
+                return this.NotFound();
+            }
+
+            var patient = await this._context.Patients
+                .SingleOrDefaultAsync(x => x.PatientId == patientId);
+
+            if (patient == null)
+            {
+                return this.NotFound();
+            }
+
+            ViewBag.Patient = patient;
+            return View(new DiagnosisModel());
         }
 
         // POST: Diagnoses/Create
@@ -57,33 +91,62 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DiagnosisId,Type,Complications,Details,PatientId")] Diagnosis diagnosis)
+        public async Task<IActionResult> Create(Int32? patientId, DiagnosisModel model)
         {
+            if (patientId == null)
+            {
+                return this.NotFound();
+            }
+
+            var patient = await this._context.Patients
+                .SingleOrDefaultAsync(x => x.PatientId == patientId);
+
+            if (patient == null)
+            {
+                return this.NotFound();
+            }
+
+            ViewBag.Patient = patient;
             if (ModelState.IsValid)
             {
+                var diagnosis = new Diagnosis
+                {
+                    PatientId = patient.PatientId,
+                    Patient = patient,
+                    Complications = model.Complications,
+                    Type = model.Type,
+                    Details = model.Details
+                };
                 _context.Add(diagnosis);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", new { patientId = patient.PatientId });
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Name", diagnosis.PatientId);
-            return View(diagnosis);
+
+            return View(model);
         }
 
         // GET: Diagnoses/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(Int32? diagnosisId)
         {
-            if (id == null)
+            if (diagnosisId == null)
             {
                 return NotFound();
             }
 
-            var diagnosis = await _context.Diagnoses.FindAsync(id);
+            var diagnosis = await _context.Diagnoses.SingleOrDefaultAsync(x => x.DiagnosisId == diagnosisId);
             if (diagnosis == null)
             {
                 return NotFound();
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Name", diagnosis.PatientId);
-            return View(diagnosis);
+
+            var model = new DiagnosisModel
+            {
+                Complications = diagnosis.Complications,
+                Type = diagnosis.Type,
+                Details = diagnosis.Details
+            };
+            ViewBag.Diagnosis = diagnosis;
+            return View(model);
         }
 
         // POST: Diagnoses/Edit/5
@@ -91,48 +154,46 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DiagnosisId,Type,Complications,Details,PatientId")] Diagnosis diagnosis)
+        public async Task<IActionResult> Edit(Int32? diagnosisId, DiagnosisModel model)
         {
-            if (id != diagnosis.DiagnosisId)
+            if (diagnosisId == null)
+            {
+                return NotFound();
+            }
+
+            var diagnosis = await _context.Diagnoses.SingleOrDefaultAsync(x => x.DiagnosisId == diagnosisId);
+
+            if (diagnosis == null)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(diagnosis);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DiagnosisExists(diagnosis.DiagnosisId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                diagnosis.Complications = model.Complications;
+                diagnosis.Type = model.Type;
+                diagnosis.Details = model.Details;
+                _context.Update(diagnosis);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index), new { patientId = diagnosis.PatientId});
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Name", diagnosis.PatientId);
-            return View(diagnosis);
+            ViewBag.Diagnosis = diagnosis;
+            return View(model);
         }
 
         // GET: Diagnoses/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(Int32? diagnosisId)
         {
-            if (id == null)
+            if (diagnosisId == null)
             {
                 return NotFound();
             }
 
             var diagnosis = await _context.Diagnoses
                 .Include(d => d.Patient)
-                .FirstOrDefaultAsync(m => m.DiagnosisId == id);
+                .FirstOrDefaultAsync(m => m.DiagnosisId == diagnosisId);
+            ViewBag.Diagnosis = diagnosis;
             if (diagnosis == null)
             {
                 return NotFound();
@@ -144,17 +205,13 @@ namespace Backend5.Controllers
         // POST: Diagnoses/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(Int32 diagnosisId)
         {
-            var diagnosis = await _context.Diagnoses.FindAsync(id);
+            var diagnosis = await _context.Diagnoses.SingleOrDefaultAsync(x=> x.DiagnosisId == diagnosisId);
             _context.Diagnoses.Remove(diagnosis);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { patientId = diagnosis.PatientId});
         }
 
-        private bool DiagnosisExists(int id)
-        {
-            return _context.Diagnoses.Any(e => e.DiagnosisId == id);
-        }
     }
 }

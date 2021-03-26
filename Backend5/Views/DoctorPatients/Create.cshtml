@@ -1,4 +1,4 @@
-﻿@model Backend5.Models.DoctorPatient
+﻿@model Backend5.Models.ViewModels.DoctorPatientModel
 
 @{
     ViewData["Title"] = "Create";
@@ -10,12 +10,8 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" asp-route-doctorId="@ViewBag.Doctor.DoctorId">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="DoctorId" class="control-label"></label>
-                <select asp-for="DoctorId" class ="form-control" asp-items="ViewBag.DoctorId"></select>
-            </div>
             <div class="form-group">
                 <label asp-for="PatientId" class="control-label"></label>
                 <select asp-for="PatientId" class ="form-control" asp-items="ViewBag.PatientId"></select>
@@ -28,7 +24,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-doctorId="@ViewBag.Doctor.DoctorId">Back to List</a>
 </div>
 
 @section Scripts {

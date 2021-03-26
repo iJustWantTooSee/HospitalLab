@@ -43,9 +43,8 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="AnalysisId" />
+    <form asp-action="Delete" asp-route-analysisId="@ViewBag.Analysis.AnalysisId">
         <input type="submit" value="Delete" class="btn btn-default" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="Index" asp-route-patientId="@ViewBag.Analysis.PatientId">Back to List</a>
     </form>
 </div>

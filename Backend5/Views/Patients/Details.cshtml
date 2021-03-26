@@ -37,6 +37,8 @@
     </dl>
 </div>
 <div>
+    <a asp-controller="Analyses" asp-action="Index" asp-route-patientId="@Model.PatientId">Analyses</a> |
+    <a asp-controller="Diagnoses" asp-action="Index" asp-route-patientId="@Model.PatientId">Diagnoses</a> |
     <a asp-action="Edit" asp-route-id="@Model.PatientId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

@@ -16,5 +16,8 @@ namespace Backend5.Models.ViewModels
         public DateTime Date { get; set; }
 
         public String Status { get; set; }
+
+        [Required]
+        public Int32 LabId { get; set; }
     }
 }
