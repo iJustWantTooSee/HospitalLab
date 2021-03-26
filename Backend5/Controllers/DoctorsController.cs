@@ -80,7 +80,7 @@ namespace Backend5.Controllers
             }
 
             var doctor = await _context.Doctors.SingleOrDefaultAsync(x => x.DoctorId == id);
-            
+
             if (doctor == null)
             {
                 return NotFound();
@@ -146,7 +146,7 @@ namespace Backend5.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var doctor = await _context.Doctors.FindAsync(id);
+            var doctor = await _context.Doctors.FirstOrDefaultAsync(x => x.DoctorId == id);
             _context.Doctors.Remove(doctor);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

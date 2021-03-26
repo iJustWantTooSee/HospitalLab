@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Backend5.Data;
 using Backend5.Models;
+using Backend5.Models.ViewModels;
 
 namespace Backend5.Controllers
 {
@@ -26,15 +27,15 @@ namespace Backend5.Controllers
         }
 
         // GET: Patients/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(Int32? patientId)
         {
-            if (id == null)
+            if (patientId == null)
             {
                 return NotFound();
             }
 
             var patient = await _context.Patients
-                .FirstOrDefaultAsync(m => m.PatientId == id);
+                .FirstOrDefaultAsync(m => m.PatientId == patientId);
             if (patient == null)
             {
                 return NotFound();
@@ -46,7 +47,7 @@ namespace Backend5.Controllers
         // GET: Patients/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new PatientModel());
         }
 
         // POST: Patients/Create
@@ -54,31 +55,48 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PatientId,Name,Address,Birthday,Gender")] Patient patient)
+        public async Task<IActionResult> Create(PatientModel model)
         {
             if (ModelState.IsValid)
             {
+                var patient = new Patient
+                {
+                    Name = model.Name,
+                    Birthday = model.Birthday,
+                    Address = model.Address,
+                    Gender = model.Gender
+                };
                 _context.Add(patient);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(patient);
+            return View(model);
         }
 
         // GET: Patients/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(Int32? patientId)
         {
-            if (id == null)
+            if (patientId == null)
             {
                 return NotFound();
             }
 
-            var patient = await _context.Patients.FindAsync(id);
+            var patient = await _context.Patients.SingleOrDefaultAsync(x => x.PatientId == patientId);
+            
             if (patient == null)
             {
                 return NotFound();
             }
-            return View(patient);
+            ViewBag.PatientId = patient.PatientId;
+            var model = new PatientModel
+            {
+                Name = patient.Name,
+                Birthday = patient.Birthday,
+                Address = patient.Address,
+                Gender = patient.Gender
+            };
+
+            return View(model);
         }
 
         // POST: Patients/Edit/5
@@ -86,46 +104,44 @@ namespace Backend5.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PatientId,Name,Address,Birthday,Gender")] Patient patient)
+        public async Task<IActionResult> Edit(Int32? patientId, PatientModel model)
         {
-            if (id != patient.PatientId)
+            if (patientId == null)
             {
                 return NotFound();
             }
 
+            var patient = await _context.Patients.SingleOrDefaultAsync(x => x.PatientId == patientId);
+
+            if (patient == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.PatientId = patient.PatientId;
+
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(patient);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PatientExists(patient.PatientId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                patient.Name = model.Name;
+                patient.Birthday = model.Birthday;
+                patient.Gender = model.Gender;
+                patient.Address = model.Address;
+                await this._context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(patient);
         }
 
         // GET: Patients/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? patientId)
         {
-            if (id == null)
+            if (patientId == null)
             {
                 return NotFound();
             }
 
             var patient = await _context.Patients
-                .FirstOrDefaultAsync(m => m.PatientId == id);
+                .FirstOrDefaultAsync(m => m.PatientId == patientId);
             if (patient == null)
             {
                 return NotFound();
@@ -137,17 +153,12 @@ namespace Backend5.Controllers
         // POST: Patients/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int patientId)
         {
-            var patient = await _context.Patients.FindAsync(id);
+            var patient = await _context.Patients.FirstOrDefaultAsync(x=> x.PatientId == patientId);
             _context.Patients.Remove(patient);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PatientExists(int id)
-        {
-            return _context.Patients.Any(e => e.PatientId == id);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model Backend5.Models.Patient
+﻿@model Backend5.Models.ViewModels.PatientModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -10,9 +10,8 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit"  asp-route-patientId="@ViewBag.PatientId">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="PatientId" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
